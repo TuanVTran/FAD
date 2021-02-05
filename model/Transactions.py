@@ -3,6 +3,7 @@ import pandas as pd
 class Transactions:
     def __init__(self, data):
         self.data = data
+        self.data.sort_values(by=['Date', 'Fund ID'])
 
     def parseData(self):
         _columns = self.data.columns

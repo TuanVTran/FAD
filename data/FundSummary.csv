@@ -1,6 +1,6 @@
-﻿Date,Fund ID,NAV,Classification
-1/1/2021,Fund A,1000,Developed Market
-1/2/2021,Fund B,2000,Developed Market
-1/2/2021,Fund C,3000,Absolute Returns
-1/3/2021,Fund D,4000,Absolute Returns
-1/3/2021,Fund E,5000,Absolute Returns
+﻿Date,Fund ID,NAV,Classification,Class ID
+1/1/2021,Fund A,1000,Developed Market,Policy 1
+1/2/2021,Fund B,2000,Developed Market,Policy 1
+1/2/2021,Fund C,3000,Absolute Returns,Policy 2
+1/3/2021,Fund D,4000,Absolute Returns,Policy 2
+1/3/2021,Fund E,5000,Absolute Returns,Policy 2

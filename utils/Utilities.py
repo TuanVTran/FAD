@@ -40,8 +40,8 @@ def exportDataToExcel(path, data, sheet_name):
 def parseCSV(dir, fileName):
     return read_csv(dir + fileName)
 
-def exportToCSV(data, dir, fileName):
-    data.to_csv(dir + fileName, index=False)
+def exportToCSV(data, filePath):
+    data.to_csv(filePath, index=False)
 
 def to_date(date_str):
     return dt.datetime.strptime(date_str, "%m/%d/%Y").date()

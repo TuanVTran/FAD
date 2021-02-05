@@ -1,0 +1,7 @@
+﻿Date,Policy ID,Security ID,Weight
+1/1/2021,Policy 1,1000,25
+1/1/2021,Policy 1,1001,35
+1/1/2021,Policy 1,1002,40
+1/1/2021,Policy 2,1000,35
+1/1/2021,Policy 2,1001,40
+1/1/2021,Policy 2,1002,25
