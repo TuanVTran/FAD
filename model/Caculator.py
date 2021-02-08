@@ -1,38 +1,27 @@
 import pandas as pd
+from model.ModelManagement import ModelManagement
 
 class _Caculator:
     _instance = None
     def __init__(self):
        self.formulars = {}
 
-    def calculate_weight_cash_flow(self, fund_trans):
+    def calculate_weight_cash_flow(self, cash_flow_list):
         weight_cash_flow = 0
-        cash_flow_list = {}
-        for i, row in fund_trans.iterrows():
-            date_flow = row['Date'].strftime("%m-%d")
-            trans_value = row['Trans Value']
-            if row['Trans Type'] == 'Buy':
-                weight_cash_flow += trans_value
-            elif row['Trans Type'] == 'Sell':
-                weight_cash_flow -= trans_value
-            
-            key = 'Day ' + date_flow + ' Flow'
-            if key in cash_flow_list:
-                cash_flow_list[key] += trans_value
-            else:
-                cash_flow_list[key] = 0
-        
-        return {
-                'weight_cash_flow': weight_cash_flow, 
-                'cash_flow_list': cash_flow_list
-            }
+        for value in cash_flow_list:
+            weight_cash_flow += value
+
+        return weight_cash_flow
 
     def calculate_return_of_benchmark(self, fund_benchmark, price_begin_date, price_end_date):
         return_of_benchmark = 0
         for i,row in fund_benchmark.iterrows():
-            begin_price = price_begin_date[price_begin_date['Security ID'] == row['Security ID']].iloc[0]['Price']
-            end_price = price_end_date[price_end_date['Security ID'] == row['Security ID']].iloc[0]['Price']
-            return_of_benchmark += row['Weight'] * (end_price - begin_price)/begin_price
+            security_id = ModelManagement().benchmark_model.get_security_by_row(row)
+            security_weight = ModelManagement().benchmark_model.get_weight_by_row(row)
+            
+            begin_price = ModelManagement().price_model.get_price_by_security(price_begin_date, security_id)
+            end_price = ModelManagement().price_model.get_price_by_security(price_end_date, security_id)
+            return_of_benchmark += security_weight * (end_price - begin_price)/begin_price
         
         return return_of_benchmark
 

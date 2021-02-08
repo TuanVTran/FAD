@@ -3,54 +3,33 @@ import datetime as dt
 import time
 import numpy as np
 import sys
-import os
 
 from model import FundRORSummary as fund_ror
 from model import ClassificationSummary as class_ror
-from service import data_service
-import utils.Utilities as utils
 from model.ModelManagement import ModelManagement
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-
-DATADIR = dir_path + "\\data\\"
-POLICY_BENMARK = "PolicyBenchMark.csv"
-FUND_BENMARK = "FundBenchMark.csv"
-FUND_SUMMARY = "FundSummary.csv"
-PRICE = "Price.csv"
-TRANSACTION = "Transaction.csv"
-ROR_FILE = "FundRORSummary.csv"
-CLASS_SUMMARY_FILE = "ClassificationSummary.csv"
+from model.CSVParser import CSVParser
 
 def exportSummary():
     end_date = dt.date.today()
     np_end_date = np.datetime64(end_date)
+
     for_summary = fund_ror.FundRORSummary()
-    classification_summary = class_ror.ClassificationSummary()
-    price_end_date = ModelManagement().price_model.get_prices(np_end_date)
+    classification = for_summary.calculate_ror_summary(np_end_date)
+    for_summary.export_data()
 
-    funds = ModelManagement().summary_model.get_funds()
-    for i,r in funds.iterrows():
-        fund_id = r['Fund ID']
-        begin_date = r['Date']
-        fund_nav = r['NAV']
-        classification_name = r['Classification']
-        classification_id = r['Class ID']
-
-        for_summary.calculate_ror_summary(fund_id, fund_nav, classification_name, begin_date, np_end_date, price_end_date)
-        classification_summary.add_classification(classification_id, classification_name, fund_id, begin_date, fund_nav)
-
-    for_summary.export_data(DATADIR + ROR_FILE)
+    classification_summary = class_ror.ClassificationSummary(classification)
     classification_summary.calculate_classification_summary(np_end_date)
-    classification_summary.export_data(DATADIR + CLASS_SUMMARY_FILE)
+    classification_summary.export_data()
 
 def parse_data():
 
-    benchmark_data = utils.parseCSV(DATADIR, FUND_BENMARK)
-    fundsummary_data = utils.parseCSV(DATADIR, FUND_SUMMARY)
-    price_data = utils.parseCSV(DATADIR, PRICE)
-    transaction_data = utils.parseCSV(DATADIR, TRANSACTION)
-    policy_benchmark_data = utils.parseCSV(DATADIR, POLICY_BENMARK)
+    parser = CSVParser()
+
+    benchmark_data = parser.parse_benchmark_data()
+    fundsummary_data = parser.parse_summary_data()
+    price_data = parser.parse_price_data()
+    transaction_data = parser.parse_transaction_data()
+    policy_benchmark_data = parser.parse_policy_benchmark_data()
 
     ModelManagement().addFundSummaryModel(fundsummary_data)
     ModelManagement().addTransactionModel(transaction_data)

@@ -2,6 +2,7 @@ import pandas as pd
 import datetime as dt
 import time
 import numpy as np
+import os
 
 def read_excel(xl, sheetname):
     df = pd.read_excel(xl.io, sheet_name=sheetname, index_col=0)
@@ -45,3 +46,7 @@ def exportToCSV(data, filePath):
 
 def to_date(date_str):
     return dt.datetime.strptime(date_str, "%m/%d/%Y").date()
+
+def get_data_dir_path():
+    dir_path = os.getcwd()
+    return dir_path + "\\data\\"
