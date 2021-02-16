@@ -1,5 +1,4 @@
 import pandas as pd
-from utils import Utilities as utils
 import datetime as dt
 
 def build_cash_flow_to_export(cash_flow_list):

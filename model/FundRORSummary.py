@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 
 from utils import Utilities as utils
-from model.ModelManagement import ModelManagement
-from model.Caculator import Calculator
+from .ModelManagement import ModelManagement
+from .Caculator import Calculator
 from utils import ModelUtilities as model_utils
-
-ROR_FILE = "FundRORSummary.csv"
+import constant.configuration as constant
 
 class FundRORSummary:
     def __init__(self):
@@ -24,7 +23,7 @@ class FundRORSummary:
 
     def export_data(self, filePath = None):
         if filePath == None:
-            filePath = utils.get_data_dir_path() + ROR_FILE
+            filePath = utils.get_data_dir_path() + constant.ROR_FILE
 
         self.ror_data.round(2)
         utils.exportToCSV(self.ror_data, filePath)

@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 
 from utils import Utilities as utils
-from model.ModelManagement import ModelManagement
-from model.Caculator import Calculator
+from .ModelManagement import ModelManagement
+from .Caculator import Calculator
 from utils import ModelUtilities as model_utils
-
-CLASS_SUMMARY_FILE = "ClassificationSummary.csv"
+import constant.configuration as constant
 
 class ClassificationSummary:
 
@@ -59,7 +58,7 @@ class ClassificationSummary:
 
     def export_data(self, filePath = None):
         if filePath == None:
-            filePath = utils.get_data_dir_path() + CLASS_SUMMARY_FILE
+            filePath = utils.get_data_dir_path() + constant.CLASS_SUMMARY_FILE
 
         self.classification_data.round(2)
         utils.exportToCSV(self.classification_data, filePath)

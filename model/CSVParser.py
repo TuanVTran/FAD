@@ -1,16 +1,9 @@
 
 from model.Parser import Parser
 from utils import Utilities as utils
+import constant.configuration as constant
 
 DATADIR = utils.get_data_dir_path()
-POLICY_BENMARK = "PolicyBenchMark.csv"
-FUND_BENMARK = "FundBenchMark.csv"
-FUND_SUMMARY = "FundSummary.csv"
-PRICE = "Price.csv"
-TRANSACTION = "Transaction.csv"
-ROR_FILE = "FundRORSummary.csv"
-CLASS_SUMMARY_FILE = "ClassificationSummary.csv"
-
 
 class CSVParser(Parser):
 
@@ -18,16 +11,16 @@ class CSVParser(Parser):
         pass
 
     def parse_benchmark_data(self):
-        return utils.parseCSV(DATADIR, FUND_BENMARK)
+        return utils.parseCSV(DATADIR, constant.FUND_BENMARK)
     
     def parse_summary_data(self):
-        return utils.parseCSV(DATADIR, FUND_SUMMARY)
+        return utils.parseCSV(DATADIR, constant.FUND_SUMMARY)
 
     def parse_price_data(self):
-        return utils.parseCSV(DATADIR, PRICE)
+        return utils.parseCSV(DATADIR, constant.PRICE)
 
     def parse_transaction_data(self):
-        return utils.parseCSV(DATADIR, TRANSACTION) 
+        return utils.parseCSV(DATADIR, constant.TRANSACTION) 
     
     def parse_policy_benchmark_data(self):
-        return utils.parseCSV(DATADIR, POLICY_BENMARK)
+        return utils.parseCSV(DATADIR, constant.POLICY_BENMARK)

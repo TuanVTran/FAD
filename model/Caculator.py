@@ -1,5 +1,5 @@
 import pandas as pd
-from model.ModelManagement import ModelManagement
+from .ModelManagement import ModelManagement
 
 class _Caculator:
     _instance = None
