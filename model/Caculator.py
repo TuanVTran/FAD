@@ -1,5 +1,5 @@
 import pandas as pd
-from .ModelManagement import ModelManagement
+from .model_management import ModelManagement
 
 class _Caculator:
     _instance = None
@@ -29,6 +29,14 @@ class _Caculator:
         end_NAV = (begin_NAV + weight_cash_flow) * (1 + return_of_benchmark)
         return end_NAV
     
+    def calculate_end_NAV_by_flow(self, begin_NAV, weight_cash_flow, return_of_benchmark, begin_date, end_date):
+        between_day = (end_date - begin_date).days
+        flow_return = 0
+        for i in range(1,between_day+1):
+            flow_return = weight_cash_flow * (1 + return_of_benchmark * (between_day - i)/between_day)
+        end_NAV = begin_NAV * (1 + return_of_benchmark) + flow_return
+        return end_NAV
+
     def calculate_rate_of_return(self, begin_NAV, end_NAV):
         return (end_NAV - begin_NAV)/begin_NAV
         

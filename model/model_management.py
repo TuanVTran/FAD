@@ -1,8 +1,8 @@
-from .FundSummary import FundSummary
-from .FundBenchmark import FundBenchmark
-from .Transactions import Transactions
-from .Prices import Prices
-from .PolicyBenchmark import PolicyBenchmark
+from .fund_summary import FundSummary
+from .fund_benchmark import FundBenchmark
+from .transactions import Transactions
+from .prices import Prices
+from .policy_benchmark import PolicyBenchmark
  
 class _ModelManagement:
     _instance = None

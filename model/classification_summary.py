@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 
-from utils import Utilities as utils
-from .ModelManagement import ModelManagement
-from .Caculator import Calculator
-from utils import ModelUtilities as model_utils
+from utils import utilities as utils
+from .model_management import ModelManagement
+from .caculator import Calculator
+from utils import model_utilities as model_utils
 import constant.configuration as constant
 
 class ClassificationSummary:
@@ -66,14 +66,3 @@ class ClassificationSummary:
     def get_classification(self, class_id):
         self.classifications[class_id] = self.classifications[class_id] | {}
         return self.classifications[class_id]
-
-    def add_classification(self, class_id, classification_name, fund_id, begin_date, begin_nav):
-        if class_id in self.classifications:
-            self.classifications[class_id]['begin_nav']  += begin_nav
-            self.classifications[class_id]['funds'].append(fund_id)
-        else:
-            self.classifications[class_id] = {}
-            self.classifications[class_id]['name'] = classification_name
-            self.classifications[class_id]['begin_date'] = begin_date
-            self.classifications[class_id]['begin_nav'] = begin_nav
-            self.classifications[class_id]['funds'] = [fund_id]

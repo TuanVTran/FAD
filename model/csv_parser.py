@@ -1,6 +1,6 @@
 
-from model.Parser import Parser
-from utils import Utilities as utils
+from model.parser import Parser
+from utils import utilities as utils
 import constant.configuration as constant
 
 DATADIR = utils.get_data_dir_path()

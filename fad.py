@@ -4,20 +4,20 @@ import time
 import numpy as np
 import sys
 
-from model import FundRORSummary as fund_ror
-from model import ClassificationSummary as class_ror
-from model.ModelManagement import ModelManagement
-from model.CSVParser import CSVParser
+from model.fund_ror_summary import FundRORSummary
+from model.classification_summary import ClassificationSummary
+from model.model_management import ModelManagement
+from model.csv_parser import CSVParser
 
 def exportSummary():
     end_date = dt.date.today()
     np_end_date = np.datetime64(end_date)
 
-    for_summary = fund_ror.FundRORSummary()
+    for_summary = FundRORSummary()
     classification = for_summary.calculate_ror_summary(np_end_date)
     for_summary.export_data()
 
-    classification_summary = class_ror.ClassificationSummary(classification)
+    classification_summary = ClassificationSummary(classification)
     classification_summary.calculate_classification_summary(np_end_date)
     classification_summary.export_data()
 
