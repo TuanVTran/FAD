@@ -18,8 +18,8 @@ class FundBenchmark:
     def calculate_return_of_benchmark(self, fund_benchmark, price_begin_date, price_end_date):
         return_of_benchmark = 0
         for i,row in fund_benchmark.iterrows():
-            begin_price = price_begin_date[price_begin_date['Security ID'] == row[SECURITY_ID_COL]].iloc[0][PRICE_COL]
-            end_price = price_end_date[price_end_date['Security ID'] == row[SECURITY_ID_COL]].iloc[0][PRICE_COL]
+            begin_price = price_begin_date[price_begin_date[SECURITY_ID_COL] == row[SECURITY_ID_COL]].iloc[0][PRICE_COL]
+            end_price = price_end_date[price_end_date[SECURITY_ID_COL] == row[SECURITY_ID_COL]].iloc[0][PRICE_COL]
             return_of_benchmark += row[WEIGHT_COL] * (end_price - begin_price)/begin_price
         
         return return_of_benchmark

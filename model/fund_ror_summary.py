@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 
-from utils import utilities as utils
+from ..utils import utilities as utils
 from .model_management import ModelManagement
 from .caculator import Calculator
-from utils import model_utilities as model_utils
+from ..utils import model_utilities as model_utils
 import constant.configuration as constant
 
 class FundRORSummary:

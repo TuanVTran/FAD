@@ -38,8 +38,9 @@ def exportDataToExcel(path, data, sheet_name):
     #     workbook.set_row(0, None, header_fmt)
     #     writer.save()
 
-def parseCSV(dir, fileName):
-    return read_csv(dir + fileName)
+def parseCSV(dir, fileName, columns_date=['Date']):
+    df = pd.read_csv(dir + fileName, index_col=None, parse_dates=columns_date)
+    return df
 
 def exportToCSV(data, filePath):
     data.to_csv(filePath, index=False)
@@ -50,3 +51,22 @@ def to_date(date_str):
 def get_data_dir_path():
     dir_path = os.getcwd()
     return dir_path + "\\data\\"
+
+def get_data_sample_dir_path():
+    dir_path = os.getcwd()
+    return dir_path + "\\AccountingDataSample\\"
+
+def get_start_next_month(cur_date):
+    return (cur_date.replace(day=1) + dt.timedelta(days=32)).replace(day=1)
+
+def get_end_month(cur_date):
+    return get_start_next_month(cur_date) - dt.timedelta(1)
+
+def currency_converter(x):
+    x = (x.replace( '[\$,)]','', regex=True )
+        .replace( '[(]','-', regex=True )
+        .replace( '[,]','', regex=True ).astype(float))
+    return x
+
+def format_float_number(x):
+    return format(x, '.2f')
