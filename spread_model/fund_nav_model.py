@@ -5,6 +5,7 @@ import pandas as pd
 from calculator.fad_calculator import *
 import datetime as dt
 from spread_model.trans_model import Transaction 
+from spread_model.benchmark_model import BenchmarkReturn 
 
 ROLLING_DATA = 12
 
@@ -15,6 +16,7 @@ class FundNAV():
         self.fund_ratios_df = pd.DataFrame(columns=['Reporting Account Number', 'Reporting Account Name', 'Source Account Number', 
                             'Source Account Name', 'Begin Date'])
         self.nav_data = None
+        self.benchmark = BenchmarkReturn()
 
     def get_data_from_file(self):
         dir_path = utils.get_data_sample_dir_path()
@@ -52,30 +54,46 @@ class FundNAV():
                 if date.day_of_week >= 5:
                     working_date = date - dt.timedelta(date.day_of_week - 4)
 
+                while benchmark_df[benchmark_df['Date'] == working_date].empty :
+                    working_date = working_date - dt.timedelta(1)
+
                 working_date_list.append(working_date)
             return benchmark_df[benchmark_df['Date'].isin(working_date_list)]
 
         nav_fd = self.get_nav_df_data()
         nav_grouped_fund = nav_fd.groupby(['Reporting Account Number', 'Source Account Number'])
 
-        for name, group in nav_grouped_fund:
-            source_acc_num = name
+        for gr_name, group in nav_grouped_fund:
             source_acc_num_group = group
-
-            source_date_data = source_acc_num_group['End Date']
-            source_nav_data = source_acc_num_group['End NAV']
-
-            fund_nav_data_df = pd.DataFrame({
-                'date': source_date_data,
-                'nav': source_nav_data
-            })
 
             export_fund_df = source_acc_num_group[['Reporting Account Number', 'Reporting Account Name', 'Source Account Number', 
                             'Source Account Name', 'Begin Date']]
 
-            acc_row = export_fund_df.iloc[[0]]
-            benchmark_data_df = get_benchmark_data_by_date(source_date_data)
-            fund_beta = self.get_beta(fund_nav_data_df, benchmark_data_df)
+            acc_row = export_fund_df.iloc[[-1]]
+
+            source_acc_num = gr_name[1]
+
+            start_benmarck_date = benchmark_df.iloc[0]['Date']
+            benchmark_return_df = self.benchmark.get_bechmark_return_by_acc(source_acc_num, start_benmarck_date)
+
+            fund_beta = ''
+            if benchmark_return_df.empty:
+                fund_beta = 'Not have CRBM'
+            else:
+                source_date_data = benchmark_return_df['Date']
+                sp_benchmark_df = get_benchmark_data_by_date(source_date_data)
+
+                fund_nav_data_df = pd.DataFrame({
+                    'date': source_date_data.values,
+                    'nav': benchmark_return_df['CRBM'].values
+                })
+
+                sp_benchmark_custom_df = pd.DataFrame({
+                    'date': source_date_data.values,
+                    'nav': sp_benchmark_df['SP500'].values
+                })
+                
+                fund_beta = self.get_beta(fund_nav_data_df, sp_benchmark_custom_df)
 
             # add into radio_df to export
             acc_row['Beta'] = fund_beta
@@ -98,27 +116,29 @@ class FundNAV():
                                                     .groupby(level=0).cumsum().reset_index()
         return fund_grouped_by_report
 
-    def get_benchmark_return(self, composite_fd = None):
+    def get_benchmark_return(self, acc_number, date):
         '''
         return the benchmark return of sp500 or composite return depend on source and weight
         composite_fd is a dataframe ['source name', 'begin-value', 'end-value', 'weight']
         '''
-        if composite_fd is None:
-            return 1
+        # if composite_fd is None:
+        #     return 1
 
-        composite_cal_fd = composite_fd.copy()
-        composite_cal_fd['composite_return'] = composite_cal_fd['weight'] \
-                                                * (composite_cal_fd['end-value'] - composite_cal_fd['end-value']) \
-                                                /  composite_cal_fd['end-value']
+        # composite_cal_fd = composite_fd.copy()
+        # composite_cal_fd['composite_return'] = composite_cal_fd['weight'] \
+        #                                         * (composite_cal_fd['end-value'] - composite_cal_fd['end-value']) \
+        #                                         /  composite_cal_fd['end-value']
     
-        composite_cal_fd['cumulative_return'] = composite_cal_fd['composite_return'].cumsum()
-        return composite_cal_fd['cumulative_return'][-1]
+        # composite_cal_fd['cumulative_return'] = composite_cal_fd['composite_return'].cumsum()
+        # return composite_cal_fd['cumulative_return'][-1]
 
-    def get_end_nav(self, begin_nav, transaction_df, from_date, to_date):
+        return self.benchmark.get_bechmark_return_by_acc_date(acc_number, date)
+
+
+    def get_end_nav(self, acc_number, begin_nav, transaction_df, from_date, to_date):
         
-        # get comosite dataframe to calculate benchmark 
-        composite_fd = None
-        benchmark_return = self.get_benchmark_return()
+        # get comosite dataframe to calculate benchmark
+        benchmark_return = self.get_benchmark_return(acc_number, to_date)
 
         trans_df = transaction_df.copy()
         trans_df['date'] = transaction_df['Effective Date']
@@ -157,12 +177,9 @@ class FundNAV():
             transaction_df = trans.get_transaction(report_number, source_number, as_date, end_next_month)
             total_txn_amount = trans.get_total_base_txn_amount(transaction_df)
 
-            date_mask = (nav_in_group_by_date['Reporting Account Number'] == report_number) & (nav_in_group_by_date['As Of Date'] == as_date)
-            total_nav_group = nav_in_group_by_date[date_mask].iloc[-1]['Total Market Value']
-            
-            acc_row['% of AC'] = utils.format_float_number(current_nav/total_nav_group * 100) 
             acc_row['End Date'] = end_next_month
-            acc_row['End NAV'] = self.get_end_nav(current_nav, transaction_df, as_date, end_next_month)
+            acc_row['End NAV'] = self.get_end_nav(source_number, current_nav, transaction_df, as_date, end_next_month)
+            acc_row['ROR'] = (acc_row['End NAV'] - current_nav)/current_nav
             nav_cal_df = nav_cal_df.append(acc_row)
 
         self.nav_data = nav_cal_df

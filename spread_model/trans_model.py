@@ -18,8 +18,11 @@ class Transaction():
         self.trans_df = self.get_data_from_file()
 
     def get_data_from_file(self):
+
         dir_path = utils.get_data_sample_dir_path()
-        fund_df = pd.read_csv(dir_path + constant.TRANSACTION_FILE, index_col=None, parse_dates=self.date_columns)
+        fund_df = pd.read_csv(dir_path + constant.TRANSACTION_FILE, 
+                            index_col=None, parse_dates=self.date_columns, 
+                            converters={'Base Txn Amount': utils.currency_converter, 'Base Cost': utils.currency_converter})
         return fund_df
 
     def get_transaction(self, report_acc_number, source_acc_number, start_date, end_date):
@@ -27,18 +30,12 @@ class Transaction():
                             'Source Account Name', 'Trade Date', 'Effective Date', 'Base Txn Amount', 'Base Cost']
 
         trans_df = self.trans_df[columns_filters]
-        trans_head = trans_df.head()
-
         mask =  (trans_df['Reporting Account Number'] == report_acc_number) & \
                 (trans_df['Source Account Number'] == source_acc_number) & \
                 (trans_df['Effective Date'] > start_date) & \
                 (trans_df['Effective Date'] < end_date)
 
         trans_df = trans_df[mask]
-        for column in trans_df:
-            if column == 'Base Txn Amount' or column == 'Base Cost':
-                trans_df[column] = utils.currency_converter(trans_df[column])
-
         return trans_df
     
     def get_total_base_txn_amount(self, trans_df):

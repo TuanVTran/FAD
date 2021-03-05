@@ -63,10 +63,11 @@ def get_end_month(cur_date):
     return get_start_next_month(cur_date) - dt.timedelta(1)
 
 def currency_converter(x):
-    x = (x.replace( '[\$,)]','', regex=True )
-        .replace( '[(]','-', regex=True )
-        .replace( '[,]','', regex=True ).astype(float))
-    return x
+    x = (x.replace( '$','' )
+        .replace( '(','-')
+        .replace( ')','')
+        .replace( ',','' ))
+    return float(x)
 
 def format_float_number(x):
     return format(x, '.2f')
