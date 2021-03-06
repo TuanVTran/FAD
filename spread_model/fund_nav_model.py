@@ -83,9 +83,10 @@ class FundNAV():
                 source_date_data = benchmark_return_df['Date']
                 sp_benchmark_df = get_benchmark_data_by_date(source_date_data)
 
+                benchmark_return_df['nav'] = benchmark_return_df['CRBM'].cumprod()
                 fund_nav_data_df = pd.DataFrame({
                     'date': source_date_data.values,
-                    'nav': benchmark_return_df['CRBM'].values
+                    'nav': benchmark_return_df['nav'].values
                 })
 
                 sp_benchmark_custom_df = pd.DataFrame({

@@ -30,10 +30,3 @@ def export_report_with_spreadsheet_data():
     nav.calculate_fund_ratios(sp500_benchmark_df)
     nav.export_nav_cal()
     nav.export_ratios()
-    
-
-    
-
-
-
-
