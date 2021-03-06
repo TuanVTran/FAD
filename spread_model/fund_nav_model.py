@@ -69,15 +69,16 @@ class FundNAV():
             export_fund_df = source_acc_num_group[['Reporting Account Number', 'Reporting Account Name', 'Source Account Number', 
                             'Source Account Name', 'Begin Date']]
 
-            acc_row = export_fund_df.iloc[[-1]]
+            acc_row = export_fund_df.iloc[-1]
 
             source_acc_num = gr_name[1]
+            source_acc_name = acc_row['Source Account Name']
 
             start_benmarck_date = benchmark_df.iloc[0]['Date']
-            benchmark_return_df = self.benchmark.get_bechmark_return_by_acc(source_acc_num, start_benmarck_date)
+            benchmark_return_df = self.benchmark.get_bechmark_return_by_acc(source_acc_num, source_acc_name, start_benmarck_date)
 
             fund_beta = ''
-            if benchmark_return_df.empty:
+            if benchmark_return_df is None or benchmark_return_df.empty:
                 fund_beta = 'Not have CRBM'
             else:
                 source_date_data = benchmark_return_df['Date']
@@ -85,13 +86,13 @@ class FundNAV():
 
                 benchmark_return_df['nav'] = benchmark_return_df['CRBM'].cumprod()
                 fund_nav_data_df = pd.DataFrame({
-                    'date': source_date_data.values,
-                    'nav': benchmark_return_df['nav'].values
+                    'date': source_date_data.to_numpy(),
+                    'nav': benchmark_return_df['nav'].to_numpy()
                 })
 
                 sp_benchmark_custom_df = pd.DataFrame({
-                    'date': source_date_data.values,
-                    'nav': sp_benchmark_df['SP500'].values
+                    'date': source_date_data.to_numpy(),
+                    'nav': sp_benchmark_df['SP500'].to_numpy()
                 })
                 
                 fund_beta = self.get_beta(fund_nav_data_df, sp_benchmark_custom_df)
@@ -117,30 +118,10 @@ class FundNAV():
                                                     .groupby(level=0).cumsum().reset_index()
         return fund_grouped_by_report
 
-    def get_benchmark_return(self, acc_number, date):
-        '''
-        return the benchmark return of sp500 or composite return depend on source and weight
-        composite_fd is a dataframe ['source name', 'begin-value', 'end-value', 'weight']
-        '''
-        # if composite_fd is None:
-        #     return 1
-
-        # composite_cal_fd = composite_fd.copy()
-        # composite_cal_fd['composite_return'] = composite_cal_fd['weight'] \
-        #                                         * (composite_cal_fd['end-value'] - composite_cal_fd['end-value']) \
-        #                                         /  composite_cal_fd['end-value']
-    
-        # composite_cal_fd['cumulative_return'] = composite_cal_fd['composite_return'].cumsum()
-        # return composite_cal_fd['cumulative_return'][-1]
-
-        return self.benchmark.get_bechmark_return_by_acc_date(acc_number, date)
-
-
-    def get_end_nav(self, acc_number, begin_nav, transaction_df, from_date, to_date):
+    def get_end_nav(self, begin_nav, benchmark_return, transaction_df, from_date, to_date):
         
         # get comosite dataframe to calculate benchmark
-        benchmark_return = self.get_benchmark_return(acc_number, to_date)
-
+        
         trans_df = transaction_df.copy()
         trans_df['date'] = transaction_df['Effective Date']
         trans_df['value'] = transaction_df['Base Txn Amount']
@@ -169,6 +150,7 @@ class FundNAV():
             acc_row = export_fund_df.iloc[-1]
             report_number = acc_row['Reporting Account Number']
             source_number = acc_row['Source Account Number']
+            source_name = acc_row['Source Account Name']
             current_nav = acc_row['Total Market Value']
             as_date = acc_row['As Of Date']
 
@@ -178,8 +160,10 @@ class FundNAV():
             transaction_df = trans.get_transaction(report_number, source_number, as_date, end_next_month)
             total_txn_amount = trans.get_total_base_txn_amount(transaction_df)
 
+            benchmark_return = self.benchmark.get_bechmark_return_by_acc_date(source_number, source_name, end_next_month)
+            
             acc_row['End Date'] = end_next_month
-            acc_row['End NAV'] = self.get_end_nav(source_number, current_nav, transaction_df, as_date, end_next_month)
+            acc_row['End NAV'] = self.get_end_nav(current_nav, benchmark_return, transaction_df, as_date, end_next_month)
             acc_row['ROR'] = (acc_row['End NAV'] - current_nav)/current_nav
             nav_cal_df = nav_cal_df.append(acc_row)
 
