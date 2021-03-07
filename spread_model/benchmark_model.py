@@ -42,7 +42,6 @@ class BenchmarkReturn():
 
     def get_bechmark_return_by_acc(self, acc_num, acc_name, from_date):
         try:
-            column_key = str((acc_num, acc_name))
             acc_benchmark = self.crbm_df[['Date', acc_num]]
             acc_benchmark = acc_benchmark[acc_benchmark['Date'] >= from_date]
             acc_benchmark['CRBM'] = acc_benchmark[acc_num]
@@ -50,6 +49,19 @@ class BenchmarkReturn():
         except:
             return None
     
+    def get_bechmark_return_in_range_date(self, acc_num, acc_name, list_date):
+        try:
+            acc_benchmark = self.crbm_df[['Date', acc_num]]
+            acc_benchmark = acc_benchmark[acc_benchmark['Date'].isin(list_date)]
+            acc_benchmark['CRBM'] = acc_benchmark[acc_num]
+            return acc_benchmark
+        except:
+            return None
+
+    def get_date_list_in_benchmark(self, from_date):
+        acc_benchmark_date = self.crbm_df[self.crbm_df['Date'] >= from_date]['Date']
+        return acc_benchmark_date
+
     def get_bechmark_return_by_acc_date(self, acc_num, acc_name, date):
         column_key = str((acc_num, acc_name))
         try:

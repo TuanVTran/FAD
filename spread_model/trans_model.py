@@ -5,7 +5,6 @@ import pandas as pd
 import datetime as dt
 import numpy as np
 import decimal
-D = decimal.Decimal
 
 class Transaction():
     def __init__(self):
