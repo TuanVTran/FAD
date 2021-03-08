@@ -1,5 +1,5 @@
-import constant.configuration as constant
-from utils import utilities as utils
+import constant.file_name as file_cst
+import fad_utilities as fad_utils
 from calculator.fad_calculator import *
 import pandas as pd
 import datetime as dt
@@ -18,10 +18,10 @@ class Transaction():
 
     def get_data_from_file(self):
 
-        dir_path = utils.get_data_sample_dir_path()
-        fund_df = pd.read_csv(dir_path + constant.TRANSACTION_FILE, 
+        dir_path = fad_utils.get_data_sample_dir_path()
+        fund_df = pd.read_csv(dir_path + file_cst.TRANSACTION_FILE, 
                             index_col=None, parse_dates=self.date_columns, 
-                            converters={'Base Txn Amount': utils.currency_converter, 'Base Cost': utils.currency_converter})
+                            converters={'Base Txn Amount': fad_utils.currency_converter, 'Base Cost': fad_utils.currency_converter})
         return fund_df
 
     def get_transaction(self, report_acc_number, source_acc_number, start_date, end_date):

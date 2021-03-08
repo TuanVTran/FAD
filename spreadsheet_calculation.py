@@ -7,6 +7,9 @@ import pandas_datareader as pdr
 
 from calculator.fad_calculator import *
 from spread_model.fund_nav_model import FundNAV
+from spread_model.model_management import ModelManagement
+from spread_model.benchmark_model import BenchmarkReturn
+from spread_model.trans_model import Transaction
 
 def get_sp500(start_date, end_date):
     try:
@@ -25,8 +28,12 @@ def export_report_with_spreadsheet_data():
     start_date = dt.datetime(end_date.year - 10, end_date.month, end_date.day)
     sp500_benchmark_df = get_sp500(start_date, end_date)
     
-    nav = FundNAV()
+    ModelManagement().add_benchmark_model(BenchmarkReturn())
+    ModelManagement().add_transaction_model(Transaction())
+    ModelManagement().add_fund_nav_model(FundNAV())
+
+    nav = ModelManagement().fund_nav_model
     nav.calculate_nav_data()
-    nav.calculate_fund_ratios(sp500_benchmark_df)
     nav.export_nav_cal()
+    nav.calculate_fund_ratios(sp500_benchmark_df)
     nav.export_ratios()

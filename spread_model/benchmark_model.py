@@ -1,5 +1,5 @@
-import constant.configuration as constant
-from utils import utilities as utils
+import constant.file_name as file_cst
+import fad_utilities as fad_utils
 from calculator.fad_calculator import *
 import pandas as pd
 import datetime as dt
@@ -17,7 +17,7 @@ class BenchmarkReturn():
 
     def get_benchmark_input_from_file(self):
 
-        dir_path = utils.get_data_sample_dir_path()
+        dir_path = fad_utils.get_data_sample_dir_path()
         fund_df = pd.read_csv(dir_path + 'MgrBenchInput.csv', 
                             index_col=None)
 
@@ -25,14 +25,14 @@ class BenchmarkReturn():
 
     def get_bbg_return_from_file(self):
 
-        dir_path = utils.get_data_sample_dir_path()
+        dir_path = fad_utils.get_data_sample_dir_path()
         fund_df = pd.read_csv(dir_path + 'BBGReturnMnth.csv', 
                             index_col=None, parse_dates=['Date'])
         return fund_df
 
     # get from file or cache if calculated , if not we calculate and save
     def get_benchmark_return(self):
-        dir_path = utils.get_data_sample_dir_path()
+        dir_path = fad_utils.get_data_sample_dir_path()
         if path.exists(dir_path + 'crbm.csv'):
             self.crbm_df = pd.read_csv(dir_path + 'crbm.csv',
                             index_col=None, parse_dates=['Date'])
@@ -45,6 +45,7 @@ class BenchmarkReturn():
             acc_benchmark = self.crbm_df[['Date', acc_num]]
             acc_benchmark = acc_benchmark[acc_benchmark['Date'] >= from_date]
             acc_benchmark['CRBM'] = acc_benchmark[acc_num]
+            acc_benchmark['CRBM'] = acc_benchmark['CRBM']
             return acc_benchmark
         except:
             return None
@@ -54,6 +55,7 @@ class BenchmarkReturn():
             acc_benchmark = self.crbm_df[['Date', acc_num]]
             acc_benchmark = acc_benchmark[acc_benchmark['Date'].isin(list_date)]
             acc_benchmark['CRBM'] = acc_benchmark[acc_num]
+            acc_benchmark['CRBM'] = acc_benchmark['CRBM']
             return acc_benchmark
         except:
             return None
@@ -63,7 +65,6 @@ class BenchmarkReturn():
         return acc_benchmark_date
 
     def get_bechmark_return_by_acc_date(self, acc_num, acc_name, date):
-        column_key = str((acc_num, acc_name))
         try:
             acc_benchmark = self.crbm_df[['Date', acc_num]]
             acc_benchmark = acc_benchmark[acc_benchmark['Date'] == date]
@@ -93,7 +94,7 @@ class BenchmarkReturn():
             x =  cal_benchmark.mul(v.array).sum(axis=1)
             bm_cal_return_df[acc_num] = x.to_numpy()
 
-        dir_path = utils.get_data_sample_dir_path()
+        dir_path = fad_utils.get_data_sample_dir_path()
         bm_cal_return_df.to_csv(dir_path + 'crbm.csv',index=False)
         return bm_cal_return_df
         
